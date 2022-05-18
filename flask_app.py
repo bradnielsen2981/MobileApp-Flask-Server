@@ -1,17 +1,22 @@
 #---PYTHON LIBRARIES FOR IMPORT--------------------------------------
 import uuid, sys, logging, math, time, os, re
-from flask import Flask, render_template, session, request, redirect, url_for, flash, jsonify
-from flask_cors import CORS #Needs to be installed to allow cross origin
+from flask import Flask, render_template, session, request, redirect, url_for, flash, jsonify, send_from_directory
+from werkzeug.utils import secure_filename
 from databaseinterface import Database
 from datetime import datetime
 import requests #needed for an external API
-import helpers
+#import helpers
+#from bs4 import BeautifulSoup #web scraping - i think this will only work if you have a paid PythonAnywhere account
+#from flask_cors import CORS #----------NEEDS TO BE INSTALLED to allow cross origin pip install flask-cors
+
+#THINK ABOUT SECURITY PRECAUTIONS - multifactor authentication, password length, 
+# password hashing, CORS, POST vs GET, HTTPS, Restricting upload file types, checking session id, permission
 
 #---CONFIGURE APP---------------------------------------------------#
 sys.tracebacklimit = 2 #Level of python traceback - useful for reducing error text
 app = Flask(__name__) #Creates the Flask Server Object
-#DELETE config from object
-CORS(app) #enables cross domain scripting protection
+DATABASE = Database('/home/nielbrad/mysite/test.sqlite', app.logger)
+#CORS(app) #enables cross domain scripting protection - necessary when communicating with the app
 
 # LOGIN SCRIPT
 @app.route('/login', methods=['GET','POST'])
@@ -22,15 +27,15 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         userdetails = DATABASE.ViewQuery("SELECT * FROM users WHERE email = ?", (email,))
-        app.logger.info(userdetails)
+        app.logger.info(userdetails) #Log the results 
         if userdetails:
-            user = userdetails[0]
+            user = userdetails[0] #only get the first row
+            session['userid'] = user['userid'] #save in session
+            session['permission'] = user['permission']
             data = { "success":True, "message":"Login successful"}
             data['userid'] = user['userid']
-            # session['userid'] = user['userid']
-            data['permission'] = user['permission']
             data['name'] = user['name']
-    return jsonify(data) #returns the data to the app
+    return jsonify(data) #returns the data to the app in JSON 
 
 #main method called web server application
 if __name__ == '__main__':
