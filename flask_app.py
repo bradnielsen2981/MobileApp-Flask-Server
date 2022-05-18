@@ -10,7 +10,7 @@ import requests #needed for an external API
 #from flask_cors import CORS #----------NEEDS TO BE INSTALLED to allow cross origin pip install flask-cors
 
 #THINK ABOUT SECURITY PRECAUTIONS - multifactor authentication, password length, 
-# password hashing, CORS, POST vs GET, HTTPS, Restricting upload file types, checking session id, permission
+# password hashing, CORS, POST vs GET, HTTPS, Restricting upload file types, checking session id, session permission
 
 #---CONFIGURE APP---------------------------------------------------#
 sys.tracebacklimit = 2 #Level of python traceback - useful for reducing error text
